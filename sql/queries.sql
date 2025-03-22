@@ -1,4 +1,3 @@
--- Model Performance Analysis
 CREATE OR REPLACE VIEW model_performance AS
 SELECT 
     model_name,
