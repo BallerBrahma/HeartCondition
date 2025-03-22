@@ -11,7 +11,6 @@ SELECT
 FROM model_predictions
 GROUP BY model_name;
 
--- Feature Importance Analysis
 CREATE OR REPLACE VIEW feature_importance AS
 WITH model_metrics AS (
     SELECT 
@@ -28,7 +27,6 @@ FROM model_metrics
 WHERE metric->>'importance' IS NOT NULL
 ORDER BY model_name, importance DESC;
 
--- Patient Risk Analysis
 CREATE OR REPLACE VIEW patient_risk_analysis AS
 SELECT 
     p.id,
@@ -52,7 +50,6 @@ SELECT
 FROM processed_heart_data p
 JOIN model_predictions mp ON p.id = mp.patient_id;
 
--- Risk Score Distribution
 CREATE OR REPLACE VIEW risk_score_distribution AS
 SELECT 
     model_name,
@@ -67,7 +64,6 @@ FROM model_predictions
 GROUP BY model_name, risk_category
 ORDER BY model_name, risk_category;
 
--- Model Comparison
 CREATE OR REPLACE VIEW model_comparison AS
 SELECT 
     mp1.patient_id,
@@ -85,7 +81,6 @@ FROM model_predictions mp1
 JOIN model_predictions mp2 ON mp1.patient_id = mp2.patient_id
 WHERE mp1.model_name < mp2.model_name;
 
--- Patient Demographics Analysis
 CREATE OR REPLACE VIEW patient_demographics AS
 SELECT 
     age_group,
@@ -97,7 +92,6 @@ FROM processed_heart_data
 GROUP BY age_group, sex
 ORDER BY age_group, sex;
 
--- Feature Correlation Analysis
 CREATE OR REPLACE VIEW feature_correlations AS
 SELECT 
     feature1,
@@ -118,7 +112,6 @@ FROM (
         corr(trestbps_normalized, target) as correlation,
         COUNT(*) as sample_size
     FROM processed_heart_data
-    -- Add more feature correlations as needed
 ) correlations
 WHERE correlation IS NOT NULL
 ORDER BY ABS(correlation) DESC; 
