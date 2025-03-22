@@ -1,0 +1,315 @@
+<?xml version='1.0' encoding='utf-8'?>
+<workbook>
+  <preferences>
+    <preference name="vizql.server.url" value="http://localhost:8000"/>
+    <preference name="vizql.server.port" value="8000"/>
+    <preference name="vizql.server.protocol" value="http"/>
+    <preference name="vizql.server.theme" value="modern"/>
+  </preferences>
+  
+  <datasources>
+    <datasource name="Heart Disease Data" caption="Heart Disease Data">
+      <connection class="postgres" dbname="heart_disease" port="5432" server="localhost">
+        <relation name="tableau_model_trends" table="[public].[tableau_model_trends]" type="table"/>
+        <relation name="tableau_patient_profiles" table="[public].[tableau_patient_profiles]" type="table"/>
+        <relation name="tableau_demographic_risk" table="[public].[tableau_demographic_risk]" type="table"/>
+        <relation name="tableau_feature_importance" table="[public].[tableau_feature_importance]" type="table"/>
+        <relation name="tableau_risk_assessment" table="[public].[tableau_risk_assessment]" type="table"/>
+        <relation name="model_comparison" table="[public].[model_comparison]" type="table"/>
+        <relation name="feature_correlations" table="[public].[feature_correlations]" type="table"/>
+      </connection>
+    </datasource>
+  </datasources>
+
+  <parameters>
+    <parameter name="Risk Threshold Low" datatype="float" default-value="0.2"/>
+    <parameter name="Risk Threshold Medium" datatype="float" default-value="0.4"/>
+    <parameter name="Risk Threshold High" datatype="float" default-value="0.6"/>
+    <parameter name="Confidence Threshold" datatype="float" default-value="0.8"/>
+    <parameter name="Color Scheme" datatype="string" default-value="Modern">
+      <members>
+        <member value="Modern"/>
+        <member value="Classic"/>
+        <member value="Healthcare"/>
+      </members>
+    </parameter>
+  </parameters>
+
+  <styles>
+    <style name="Modern Theme">
+      <color-palette>
+        <color name="primary" value="#2c3e50"/>
+        <color name="secondary" value="#3498db"/>
+        <color name="accent" value="#e74c3c"/>
+        <color name="success" value="#2ecc71"/>
+        <color name="warning" value="#f1c40f"/>
+        <color name="background" value="#ecf0f1"/>
+        <color name="text" value="#2c3e50"/>
+      </color-palette>
+      <font-family>Helvetica Neue</font-family>
+      <font-size>12</font-size>
+    </style>
+    <style name="Healthcare Theme">
+      <color-palette>
+        <color name="primary" value="#2980b9"/>
+        <color name="secondary" value="#16a085"/>
+        <color name="accent" value="#c0392b"/>
+        <color name="success" value="#27ae60"/>
+        <color name="warning" value="#f39c12"/>
+        <color name="background" value="#f5f6fa"/>
+        <color name="text" value="#34495e"/>
+      </color-palette>
+      <font-family>Open Sans</font-family>
+      <font-size>12</font-size>
+    </style>
+  </styles>
+
+  <worksheets>
+    <!-- Model Performance Dashboard -->
+    <worksheet name="Model Performance">
+      <datasource-dependencies>
+        <datasource name="Heart Disease Data"/>
+      </datasource-dependencies>
+      <layout>
+        <zone name="Model Accuracy">
+          <visualization>
+            <type>bar</type>
+            <datasource>tableau_model_trends</datasource>
+            <columns>
+              <column name="model_name"/>
+              <column name="accuracy"/>
+            </columns>
+            <marks>
+              <mark type="bar" color="#3498db" gradient="true"/>
+              <mark type="line" color="#2c3e50" thickness="2"/>
+            </marks>
+            <animation>
+              <type>fade</type>
+              <duration>500</duration>
+            </animation>
+            <tooltip>
+              <format>Model: {model_name}
+Accuracy: {accuracy:.2%}
+Total Predictions: {total_predictions}</format>
+            </tooltip>
+          </visualization>
+        </zone>
+        <zone name="Confusion Matrix">
+          <visualization>
+            <type>heatmap</type>
+            <datasource>patient_risk_analysis</datasource>
+            <columns>
+              <column name="prediction_accuracy"/>
+              <column name="risk_category"/>
+              <column name="COUNT"/>
+            </columns>
+            <marks>
+              <mark type="square" color="#e74c3c" gradient="true"/>
+            </marks>
+            <animation>
+              <type>scale</type>
+              <duration>500</duration>
+            </animation>
+            <tooltip>
+              <format>Accuracy: {prediction_accuracy}
+Risk Category: {risk_category}
+Count: {COUNT}</format>
+            </tooltip>
+          </visualization>
+        </zone>
+      </layout>
+    </worksheet>
+
+    <!-- Patient Demographics Dashboard -->
+    <worksheet name="Patient Demographics">
+      <datasource-dependencies>
+        <datasource name="Heart Disease Data"/>
+      </datasource-dependencies>
+      <layout>
+        <zone name="Age Distribution">
+          <visualization>
+            <type>bar</type>
+            <datasource>tableau_demographic_risk</datasource>
+            <columns>
+              <column name="age_group"/>
+              <column name="total_patients"/>
+              <column name="heart_disease_cases"/>
+            </columns>
+            <marks>
+              <mark type="bar" color="#3498db" gradient="true"/>
+              <mark type="line" color="#2c3e50" thickness="2"/>
+            </marks>
+            <animation>
+              <type>slide</type>
+              <duration>500</duration>
+            </animation>
+            <tooltip>
+              <format>Age Group: {age_group}
+Total Patients: {total_patients}
+Heart Disease Cases: {heart_disease_cases}
+Rate: {heart_disease_rate:.2%}</format>
+            </tooltip>
+          </visualization>
+        </zone>
+        <zone name="Gender Analysis">
+          <visualization>
+            <type>donut</type>
+            <datasource>tableau_patient_profiles</datasource>
+            <columns>
+              <column name="sex"/>
+              <column name="risk_category"/>
+              <column name="COUNT"/>
+            </columns>
+            <marks>
+              <mark type="donut" color="#e74c3c" gradient="true"/>
+            </marks>
+            <animation>
+              <type>rotate</type>
+              <duration>500</duration>
+            </animation>
+            <tooltip>
+              <format>Gender: {sex}
+Risk Category: {risk_category}
+Count: {COUNT}</format>
+            </tooltip>
+          </visualization>
+        </zone>
+      </layout>
+    </worksheet>
+
+    <!-- Risk Analysis Dashboard -->
+    <worksheet name="Risk Analysis">
+      <datasource-dependencies>
+        <datasource name="Heart Disease Data"/>
+      </datasource-dependencies>
+      <layout>
+        <zone name="Risk Distribution">
+          <visualization>
+            <type>histogram</type>
+            <datasource>tableau_patient_profiles</datasource>
+            <columns>
+              <column name="risk_score"/>
+              <column name="COUNT"/>
+            </columns>
+            <marks>
+              <mark type="bar" color="#e74c3c" gradient="true"/>
+              <mark type="line" color="#2c3e50" thickness="2"/>
+            </marks>
+            <animation>
+              <type>fade</type>
+              <duration>500</duration>
+            </animation>
+            <tooltip>
+              <format>Risk Score: {risk_score:.2f}
+Count: {COUNT}</format>
+            </tooltip>
+          </visualization>
+        </zone>
+        <zone name="Feature Importance">
+          <visualization>
+            <type>bar</type>
+            <datasource>tableau_feature_importance</datasource>
+            <columns>
+              <column name="feature_name"/>
+              <column name="importance"/>
+            </columns>
+            <marks>
+              <mark type="bar" color="#3498db" gradient="true"/>
+            </marks>
+            <animation>
+              <type>slide</type>
+              <duration>500</duration>
+            </animation>
+            <tooltip>
+              <format>Feature: {feature_name}
+Importance: {importance:.2f}
+Rank: {rank}</format>
+            </tooltip>
+          </visualization>
+        </zone>
+      </layout>
+    </worksheet>
+
+    <!-- Interactive Prediction Dashboard -->
+    <worksheet name="Risk Assessment">
+      <datasource-dependencies>
+        <datasource name="Heart Disease Data"/>
+      </datasource-dependencies>
+      <layout>
+        <zone name="Risk Score Gauge">
+          <visualization>
+            <type>gauge</type>
+            <datasource>tableau_risk_assessment</datasource>
+            <columns>
+              <column name="risk_category"/>
+              <column name="risk_score"/>
+            </columns>
+            <marks>
+              <mark type="gauge" color="#2ecc71" gradient="true"/>
+            </marks>
+            <animation>
+              <type>rotate</type>
+              <duration>500</duration>
+            </animation>
+            <tooltip>
+              <format>Risk Category: {risk_category}
+Score: {risk_score:.2f}</format>
+            </tooltip>
+          </visualization>
+        </zone>
+        <zone name="Risk Factors">
+          <visualization>
+            <type>treemap</type>
+            <datasource>tableau_risk_assessment</datasource>
+            <columns>
+              <column name="risk_factors"/>
+              <column name="COUNT"/>
+            </columns>
+            <marks>
+              <mark type="square" color="#e74c3c" gradient="true"/>
+            </marks>
+            <animation>
+              <type="scale</type>
+              <duration>500</duration>
+            </animation>
+            <tooltip>
+              <format>Risk Factors: {risk_factors}
+Count: {COUNT}</format>
+            </tooltip>
+          </visualization>
+        </zone>
+      </layout>
+    </worksheet>
+  </worksheets>
+
+  <dashboards>
+    <dashboard name="Heart Disease Prediction Analysis">
+      <layout>
+        <zone name="Model Performance" worksheet="Model Performance"/>
+        <zone name="Patient Demographics" worksheet="Patient Demographics"/>
+        <zone name="Risk Analysis" worksheet="Risk Analysis"/>
+        <zone name="Risk Assessment" worksheet="Risk Assessment"/>
+      </layout>
+      <filters>
+        <filter name="Date Range" type="date"/>
+        <filter name="Model Selection" type="string"/>
+        <filter name="Risk Category" type="string"/>
+        <filter name="Age Group" type="string"/>
+        <filter name="Gender" type="string"/>
+      </filters>
+      <actions>
+        <action name="Highlight" type="highlight"/>
+        <action name="Filter" type="filter"/>
+        <action name="URL" type="url"/>
+      </actions>
+      <parameters>
+        <parameter name="Color Scheme" type="string"/>
+      </parameters>
+      <theme>
+        <background color="#ecf0f1"/>
+        <title font-family="Helvetica Neue" font-size="24" color="#2c3e50"/>
+        <subtitle font-family="Helvetica Neue" font-size="16" color="#7f8c8d"/>
+      </theme>
+    </dashboard>
+  </dashboards>
+</workbook> 
