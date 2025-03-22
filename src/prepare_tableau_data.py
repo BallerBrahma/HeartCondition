@@ -5,10 +5,8 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime
 
-# Load environment variables
 load_dotenv()
 
-# Database connection
 DB_URL = os.getenv('DATABASE_URL', 'postgresql://localhost/heart_disease')
 engine = create_engine(DB_URL)
 
@@ -16,7 +14,6 @@ def create_tableau_views():
     """Create additional views optimized for Tableau visualization."""
     
     with engine.connect() as connection:
-        # Create a view for model performance trends
         connection.execute(text("""
         CREATE OR REPLACE VIEW tableau_model_trends AS
         SELECT 
@@ -31,7 +28,6 @@ def create_tableau_views():
         ORDER BY prediction_date, mp.model_name;
         """))
         
-        # Create a view for patient risk profiles
         connection.execute(text("""
         CREATE OR REPLACE VIEW tableau_patient_profiles AS
         SELECT 
@@ -67,7 +63,6 @@ def create_tableau_views():
         JOIN model_predictions mp ON p.id = mp.patient_id;
         """))
         
-        # Create a view for demographic risk analysis
         connection.execute(text("""
         CREATE OR REPLACE VIEW tableau_demographic_risk AS
         SELECT 
@@ -85,7 +80,6 @@ def create_tableau_views():
         ORDER BY p.age_group, p.sex;
         """))
         
-        # Create a view for prediction confidence analysis
         connection.execute(text("""
         CREATE OR REPLACE VIEW tableau_prediction_confidence AS
         SELECT 
@@ -111,7 +105,6 @@ def create_calculated_fields():
     """Create calculated fields for Tableau."""
     
     with engine.connect() as connection:
-        # Create a view with calculated fields for risk assessment
         connection.execute(text("""
         CREATE OR REPLACE VIEW tableau_risk_assessment AS
         SELECT 
@@ -147,11 +140,9 @@ def main():
     """Main function to prepare data for Tableau."""
     print("Starting Tableau data preparation...")
     
-    # Create optimized views for Tableau
     create_tableau_views()
     print("Created Tableau-specific views")
     
-    # Create calculated fields
     create_calculated_fields()
     print("Created calculated fields")
     
