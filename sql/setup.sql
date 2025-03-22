@@ -1,4 +1,3 @@
--- Create the raw data table
 CREATE TABLE IF NOT EXISTS raw_heart_data (
     id SERIAL PRIMARY KEY,
     age INTEGER,
@@ -18,7 +17,6 @@ CREATE TABLE IF NOT EXISTS raw_heart_data (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create the processed data table
 CREATE TABLE IF NOT EXISTS processed_heart_data (
     id SERIAL PRIMARY KEY,
     age_group VARCHAR(20),
@@ -38,7 +36,6 @@ CREATE TABLE IF NOT EXISTS processed_heart_data (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create the model predictions table
 CREATE TABLE IF NOT EXISTS model_predictions (
     id SERIAL PRIMARY KEY,
     patient_id INTEGER REFERENCES processed_heart_data(id),
@@ -48,7 +45,6 @@ CREATE TABLE IF NOT EXISTS model_predictions (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create a view for model training data
 CREATE OR REPLACE VIEW model_training_data AS
 SELECT 
     age_group,
@@ -67,7 +63,6 @@ SELECT
     target
 FROM processed_heart_data;
 
--- Create indexes for better query performance
 CREATE INDEX IF NOT EXISTS idx_raw_heart_data_target ON raw_heart_data(target);
 CREATE INDEX IF NOT EXISTS idx_processed_heart_data_target ON processed_heart_data(target);
 CREATE INDEX IF NOT EXISTS idx_model_predictions_patient_id ON model_predictions(patient_id); 
